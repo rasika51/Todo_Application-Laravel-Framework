@@ -7,7 +7,9 @@
 <form action="{{ route('tasks.store') }}" method="POST" class="mb-4">
     @csrf
     <div class="input-group">
-        <input type="text" name="title" class="form-control" placeholder="New Task" required>
+        
+        <input type="text" name="title" class="form-control" placeholder="New Task" required >
+        
         <button class="btn btn-success" type="submit">Add</button>
     </div>
 </form>
@@ -32,6 +34,7 @@
 </div>
 
 <!-- Task List -->
+<!-- Task List -->
 <ul class="list-group">
     @forelse ($tasks as $task)
         <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -45,6 +48,7 @@
                     method="POST" style="display: none;">
                     @csrf
                     @method('PUT')
+                    <!-- Send the opposite of the current value for toggling -->
                     <input type="hidden" name="is_completed" value="{{ !$task->is_completed }}">
                 </form>
 
@@ -70,6 +74,7 @@
     @endforelse
 </ul>
 
+
 @endsection
 
 @section('styles')
@@ -79,6 +84,9 @@
     .task-controls .form-select {
         width: 100%;
     }
+
+/* Custom styling for input group */
+
 
     .task-controls form {
         flex-grow: 1;
@@ -100,50 +108,7 @@
 
     /* Media Query for Small Screens (Mobile View) */
 /* Media Query for Small Screens (Mobile View) */
-@media (max-width: 767px) {
-    .input-group {
-        flex-direction: column; /* Stack input and button vertically */
-        width: 100%; /* Full width for the group */
-    }
 
-    .input-group .form-control {
-        width: 100%; /* Full width for input */
-        margin-bottom: 10px; /* Space between input and button */
-    }
-
-    .input-group button,
-    .btn {
-        width: 100%; /* Full width for buttons */
-    }
-
-    .task-controls {
-        flex-direction: column; /* Stack filter and search vertically */
-        gap: 10px; /* Add spacing between the forms */
-    }
-}
-
-/* Media Query for Larger Screens (Above 767px) */
-@media (min-width: 768px) {
-    .input-group {
-        flex-direction: row; /* Input and button side by side */
-    }
-
-    .input-group .form-control {
-        width: 80%; /* Input takes up 80% width */
-    }
-
-    .input-group button {
-        width: 20%; /* Button takes up 20% width */
-    }
-
-    .btn {
-        width: auto; /* Buttons adjust naturally */
-    }
-
-    .task-controls {
-        flex-direction: row; /* Filter and search side by side */
-    }
-}
 
 </style>
 @endsection
