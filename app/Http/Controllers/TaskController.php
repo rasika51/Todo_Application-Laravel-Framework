@@ -50,19 +50,25 @@ class TaskController extends Controller
         return view('tasks.edit', compact('task'));
     }
 
-    public function update(Request $request, Task $task)
+    public function update(Request $request, $id)
     {
-        // Validate the request data
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'is_completed' => 'nullable|boolean', // Optional field
-        ]);
-
-        // Update the title and completion status if provided
-        $task->update($request->only(['title', 'is_completed']));
-
-        return redirect()->route('tasks.index')->with('success', 'Task updated successfully!');
+        // Find the task by its ID
+        $task = Task::findOrFail($id);
+    
+        // Make sure the value of 'is_completed' is either 0 or 1
+        $isCompleted = $request->input('is_completed') === '1' ? true : false;
+    
+        // Update the 'is_completed' field using the incoming request value
+        $task->is_completed = $isCompleted;
+    
+        // Save the task
+        $task->save();
+    
+        // Redirect back to the task list or wherever
+        return redirect()->route('tasks.index');
     }
+
+
 
     public function destroy(Task $task)
     {
