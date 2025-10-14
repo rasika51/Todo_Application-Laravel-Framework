@@ -13,8 +13,8 @@ class TaskController extends Controller
         $filter = $request->input('filter', 'all'); // Default to 'all'
         $search = $request->input('search', '');   // Default to an empty search
 
-        // Start building the query
-        $tasks = Task::query();
+        // Start building the query for the authenticated user
+        $tasks = Task::where('user_id', auth()->id());
 
         // Apply search filter if a search term is provided
         if (!empty($search)) {
@@ -39,8 +39,11 @@ class TaskController extends Controller
         // Validate the input
         $request->validate(['title' => 'required|string|max:255']);
 
-        // Create a new task
-        Task::create($request->only('title'));
+        // Create a new task for the authenticated user
+        Task::create([
+            'title' => $request->title,
+            'user_id' => auth()->id()
+        ]);
 
         return redirect()->route('tasks.index')->with('success', 'Task added successfully!');
     }
@@ -52,19 +55,29 @@ class TaskController extends Controller
 
     public function update(Request $request, $id)
     {
-        // Find the task by its ID
-        $task = Task::findOrFail($id);
+        // Find the task by its ID and ensure it belongs to the authenticated user
+        $task = Task::where('id', $id)->where('user_id', auth()->id())->firstOrFail();
     
-        // Make sure the value of 'is_completed' is either 0 or 1
-        $isCompleted = $request->input('is_completed') === '1' ? true : false;
+        // Check if this is a toggle request (only is_completed is provided)
+        if ($request->has('is_completed') && !$request->has('title')) {
+            // Toggle completion status
+            $task->update([
+                'is_completed' => $request->input('is_completed') === '1' || $request->input('is_completed') === 1
+            ]);
+        } else {
+            // Full update with validation
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'is_completed' => 'required|in:0,1'
+            ]);
+            
+            $task->update([
+                'title' => $request->title,
+                'is_completed' => $request->input('is_completed') === '1' || $request->input('is_completed') === 1
+            ]);
+        }
     
-        // Update the 'is_completed' field using the incoming request value
-        $task->is_completed = $isCompleted;
-    
-        // Save the task
-        $task->save();
-    
-        // Redirect back to the task list or wherever
+        // Redirect back to the task list
         return redirect()->route('tasks.index');
     }
 
