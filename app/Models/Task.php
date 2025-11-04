@@ -9,13 +9,15 @@ class Task extends Model
 {
     use HasFactory;
 
-    // Add this property to cast is_completed as a boolean
-    // Add this property to cast is_completed as a boolean
-    protected $fillable = ['title', 'is_completed'];
+    protected $fillable = ['title', 'is_completed', 'user_id'];
 
-    // Cast the is_completed column as a boolean
     protected $casts = [
         'is_completed' => 'boolean',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
 
